@@ -1,0 +1,25 @@
+[MASTER]
+# Use multiple processes to speed up Pylint. Specifying 0 will auto-detect the
+# number of processors available to use.
+jobs=0
+load-plugins=pylint_json2html
+
+[MESSAGES CONTROL]
+disable=C0325,C0411,C0103,W0105,W1202
+
+
+[FORMAT]
+# Maximum number of characters on a single line.
+max-line-length=120
+
+
+[DESIGN]
+
+# Maximum number of arguments for function / method
+max-args=10
+
+[REPORTS]
+# Tells whether to display a full report or only the messages.
+reports=yes
+
+output-format=json
