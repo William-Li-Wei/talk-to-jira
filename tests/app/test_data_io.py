@@ -21,6 +21,14 @@ def test_record_audio_from_file():
     assert isinstance(audio, AudioData)
 
 
+def test_record_audio_from_microphone():
+    """test record_audio_from_microphone"""
+
+    audio = data_io.record_audio_from_microphone()
+
+    assert isinstance(audio, AudioData)
+
+
 def test_recognize_speech_from_audio():
     """test recognize_speech_from_audio"""
 

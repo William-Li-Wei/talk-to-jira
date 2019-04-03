@@ -3,7 +3,8 @@
 """
 
 from speech_recognition import Recognizer
-from speech_recognition import AudioFile, AudioData
+from speech_recognition import Microphone, AudioFile
+from speech_recognition import AudioData
 from speech_recognition import RequestError, UnknownValueError
 
 
@@ -22,6 +23,28 @@ def record_audio_from_file(audio_path: str):
     with AudioFile(audio_path) as source:
         recognizer.adjust_for_ambient_noise(source)
         audio = recognizer.record(source)
+
+    return audio
+
+
+def record_audio_from_microphone():
+    """
+    captures audio data from microphone
+
+    Args:
+
+    Returns:
+        audio: instance of AudioData
+    """
+
+    recognizer = Recognizer()
+
+    with Microphone() as source:
+        print('>>> processing noise ...')
+        recognizer.adjust_for_ambient_noise(source)
+        print('>>> say something.')
+        audio = recognizer.listen(source)
+        print('>>> audio captured.')
 
     return audio
 
