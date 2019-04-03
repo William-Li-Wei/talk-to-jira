@@ -3,9 +3,11 @@ name: talk-to-jira
 dependencies:
   - conda
   - python=3.7
+  - pytest
 
   - pip:
     - SpeechRecognition==3.8.1
+    - pyaudio
     - flake8==3.6.0
     - flake8-html==0.4.0
     - pylint==2.3.1
