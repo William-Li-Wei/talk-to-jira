@@ -10,8 +10,9 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__fi
 sys.path.insert(0, project_root)
 
 
-from app.controllers.worklog import WorklogController
-from app import data_io
+#  from app.controllers.worklog import WorklogController
+#  from app import data_io
+from app import dispatch
 
 
 if __name__ == "__main__":
@@ -26,6 +27,8 @@ if __name__ == "__main__":
 
     # print(res.text)
 
-    audio = data_io.record_audio_from_microphone()
-    text = data_io.recognize_speech_from_audio(audio)
-    print(text)
+    #  audio = data_io.record_audio_from_microphone()
+    #  text = data_io.recognize_speech_from_audio(audio)
+    #  print(text)
+
+    dispatch.get_controller_by_trigger('log my time')
