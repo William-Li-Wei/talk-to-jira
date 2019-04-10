@@ -27,7 +27,5 @@ def get_controller_by_trigger(trigger: str):
         module = importlib.import_module(module_path)
 
         #  instanciate the controller
-        controller = module.Controller(trigger)
-        controller.test()
-
-        print(type(controller))
+        controller = module.Controller()
+        print(controller.config)
