@@ -7,7 +7,7 @@ dependencies:
 
   - pip:
     - SpeechRecognition==3.8.1
-    - pyaudio=0.2.11
+    - pyaudio==0.2.11
     - flake8==3.6.0
     - flake8-html==0.4.0
     - pylint==2.3.1
