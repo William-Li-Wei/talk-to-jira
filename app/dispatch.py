@@ -28,4 +28,6 @@ def get_controller_by_trigger(trigger: str):
 
         #  instanciate the controller
         controller = module.Controller()
-        print(controller.config)
+        found = controller.respond_to_trigger(trigger)
+        if found:
+            return controller
