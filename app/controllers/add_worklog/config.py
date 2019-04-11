@@ -19,31 +19,35 @@ MIN_COMPLETE_PATTERN = r'log\s{number}\s{timeunit}\sto\sissue\s{issuekey}'.forma
 )
 
 
-controller_settings = {
+controller_properties = {
     'trigger_patterns': [
         MIN_COMPLETE_PATTERN,
         r'log my (time|work)'
     ],
-    'params': {
-        'issueKey': {
+    'active': False,
+    'params': [
+        {
+            'name': 'issueKey',
             'required': True,
             'type': str,
             'pattern': conf.COMMON_PATTERN_ISSUEKEY,
             'input_guide': INPUT_GUIDE_REQUIRED_FIELDS
         },
-        'timeSpent': {
+        {
+            'name': 'timeSpent',
             'required': True,
             'type': str,
             'pattern': r'(?<=log\s){timespent}'.format(timespent=conf.COMMON_PATTERN_TIMESPENT),
             'input_guide': INPUT_GUIDE_REQUIRED_FIELDS
         },
-        'comment': {
+        {
+            'name': 'comment',
             'required': False,
             'type': str,
             'pattern': conf.COMMON_PATTERN_COMMENT,
             'input_guide': INPUT_GUIDE_REQUIRED_FIELDS,
             'skip_pattern': ['skip comment', 'skip all']
         }
-    }
+    ]
 
 }

@@ -31,4 +31,7 @@ if __name__ == "__main__":
     #  text = data_io.recognize_speech_from_audio(audio)
     #  print(text)
 
-    dispatch.get_controller_by_trigger('log my time')
+    trigger = "log 3.5 hours to issue NI-779 with comment as i hate this issue"
+    controller = dispatch.get_controller_by_trigger(trigger)
+    if controller:
+        print(controller.params)

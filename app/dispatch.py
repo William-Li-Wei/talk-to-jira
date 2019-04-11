@@ -14,6 +14,9 @@ def get_controller_by_trigger(trigger: str):
     Returns:
         controller: instance of the matched controller class
     """
+
+    activated_controller = None
+
     #  locate module.py of all actual controllers
     base_path = Path(os.path.relpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'controllers/')))
     module_files = list(base_path.glob('*/module.py'))
@@ -21,13 +24,15 @@ def get_controller_by_trigger(trigger: str):
     #  import each actual controler
     for module_file in module_files:
 
-        #  import module module from string
+        #  import controller module from string
         module_path = os.path.dirname(os.path.relpath(module_file)) \
             .replace('/', '.') + '.module'
         module = importlib.import_module(module_path)
 
         #  instanciate the controller
-        controller = module.Controller()
-        found = controller.respond_to_trigger(trigger)
-        if found:
-            return controller
+        controller = module.Controller(trigger)
+
+        if controller.active:
+            activated_controller = controller
+
+    return activated_controller
