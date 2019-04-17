@@ -86,3 +86,14 @@ def recognize_speech_from_audio(audio: AudioData, engine: str = "google"):
         print("Could not request results from Recognition engine({engine}); {err}.".format(engine=engine, err=e))
 
     return text
+
+
+def read_from_microphone(message: str = None):
+    print(message)
+    audio = record_audio_from_microphone()
+    text = recognize_speech_from_audio(audio)
+    return text
+
+
+def read_from_keyboard(message: str = None):
+    return input(message)

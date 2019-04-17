@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 
-def get_controller_by_trigger(trigger: str):
+def get_controller_by_trigger(trigger: str, mode: str = 'microphone'):
     """
     damically returns a specific controller that matches the trigger message's intention
 
@@ -30,9 +30,10 @@ def get_controller_by_trigger(trigger: str):
         module = importlib.import_module(module_path)
 
         #  instanciate the controller
-        controller = module.Controller(trigger)
+        controller = module.Controller(trigger, mode)
 
         if controller.active:
             activated_controller = controller
+            break
 
     return activated_controller
