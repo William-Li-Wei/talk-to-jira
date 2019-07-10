@@ -26,14 +26,17 @@ def get_controller_by_trigger(trigger: str, mode: str = 'microphone'):
 
         #  import controller module from string
         module_path = os.path.dirname(os.path.relpath(module_file)) \
-            .replace('/', '.') + '.module'
+            .replace('/', '.').replace('\\', '.') + '.module'
         module = importlib.import_module(module_path)
 
         #  instanciate the controller
         controller = module.Controller(trigger, mode)
 
+        # keep only the correct controller, delete all others for memory-release
         if controller.active:
             activated_controller = controller
             break
+        else:
+            del controller
 
     return activated_controller

@@ -49,6 +49,32 @@ def record_audio_from_microphone():
     return audio
 
 
+def __recognize_with_specified_engine(recognizer: Recognizer, audio: AudioData, engine: str):
+    text = None
+
+    try:
+        if engine == "google":
+            text = recognizer.recognize_google(audio)
+        if engine == "google_cloud":
+            text = recognizer.recognize_google_cloud(audio)
+        if engine == "bing":
+            text = recognizer.recognize_bing(audio)
+        if engine == "houndify":
+            text = recognizer.recognize_houndify(audio)
+        if engine == "ibm":
+            text = recognizer.recognize_ibm(audio)
+        if engine == "sphinx":
+            text = recognizer.recognize_sphinx(audio)
+        if engine == "wit":
+            text = recognizer.recognize_wit(audio)
+    except UnknownValueError:
+        print("Recognition engine({engine}) could not understand audio.".format(engine=engine))
+    except RequestError as e:
+        print("Could not request results from Recognition engine({engine}); {err}.".format(engine=engine, err=e))
+
+    return text
+
+
 def recognize_speech_from_audio(audio: AudioData, engine: str = "google"):
     """
     returns the recognized text
@@ -62,38 +88,30 @@ def recognize_speech_from_audio(audio: AudioData, engine: str = "google"):
         text: recognized text or None
     """
 
-    text = None
     recognizer = Recognizer()
 
-    try:
-        if engine == "google":
-            text = recognizer.recognize_google(audio)
-        if engine == "google_cloud":
-            text = recognizer.recognize_google(audio)
-        if engine == "bing":
-            text = recognizer.recognize_google(audio)
-        if engine == "houndify":
-            text = recognizer.recognize_google(audio)
-        if engine == "ibm":
-            text = recognizer.recognize_google(audio)
-        if engine == "sphinx":
-            text = recognizer.recognize_google(audio)
-        if engine == "wit":
-            text = recognizer.recognize_google(audio)
-    except UnknownValueError:
-        print("Recognition engine({engine}) could not understand audio.".format(engine=engine))
-    except RequestError as e:
-        print("Could not request results from Recognition engine({engine}); {err}.".format(engine=engine, err=e))
+    text = __recognize_with_specified_engine(recognizer, audio, engine)
+
+    # backup_engines = ["google", "google_cloud", "bing", "houndify", "ibm", "sphinx", "wit"]
+    # backup_engines.remove(engine)
+    #
+    # while (not text) and backup_engines:
+    #     engine = backup_engines.pop()
+    #     text = __recognize_with_specified_engine(recognizer, audio, engine)
 
     return text
 
 
 def read_from_microphone(message: str = None):
-    print(message)
+    if message:
+        print(message)
     audio = record_audio_from_microphone()
-    text = recognize_speech_from_audio(audio)
+    text = recognize_speech_from_audio(audio) or 'None'
+
+    print('you said: "{}"'.format(text))
     return text
 
 
 def read_from_keyboard(message: str = None):
+    message = message or 'ready for input ...'
     return input(message)

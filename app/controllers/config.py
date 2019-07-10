@@ -5,14 +5,14 @@
 COMMON_PATTERN_NUMBER = r'(\d+\.\d+|\d+)'
 COMMON_PATTERN_NUMBER_READABLE = '<NUMBER>'
 
-COMMON_PATTERN_TIMEUNIT = r'(days?|hours?|minutes?)'
+COMMON_PATTERN_TIMEUNIT = r'(day?s?|hour?s?|minute?s?)'
 COMMON_PATTERN_TIMEUNIT_READABLE = '<DAYS or HOURS or MINUTES>'
 
 COMMON_PATTERN_TIMESPENT = r'{number}\s{timeunit}' \
     .format(number=COMMON_PATTERN_NUMBER, timeunit=COMMON_PATTERN_TIMEUNIT)
 COMMON_PATTERN_TIMESPENT_READABLE = '<NUMBER> <DAYS or HOURS or MINUTES>'
 
-COMMON_PATTERN_ISSUEKEY = r'(?<=issue\s)[a-zA-Z]+\-\d+'
+COMMON_PATTERN_ISSUEKEY = r'(?<=issue\s)[a-zA-Z]+[\-\s]*\d+'
 COMMON_PATTERN_ISSUEKEY_READABLE = 'issue <ISSUE_KEY>'
 
 COMMON_PATTERN_COMMENT = r'(?<=with\scomment\sas\s).*'

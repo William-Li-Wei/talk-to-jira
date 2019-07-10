@@ -1,10 +1,12 @@
 
 import importlib
 import re
-
 from abc import ABC
+from collections import OrderedDict
 
+import config as app_conf
 from app import data_io
+
 
 
 class BaseController(ABC):
@@ -14,7 +16,7 @@ class BaseController(ABC):
 
     self.active: bool property that indicates if the current controller is activated, set by config
     self.mode: running mode from ['microphone', 'keyboard', 'api'], default to 'microphone'
-    - local mode would interact witht the microphone
+    - microphone mode would interact witht the microphone
     - keyboard mode would interact witht the keyboard
     - api mode would interact through the http REST APIs with sessions
 
@@ -23,10 +25,35 @@ class BaseController(ABC):
 
     """
 
-    __mandatory_properties = [
+    BASE_URL = app_conf.DOMAIN
+    HEADERS = {
+        "Content-Type": "application/json",
+        "Authorization": "Basic " + app_conf.AUTH_HEADER
+    }
+
+    mandatory_properties = [
         'trigger_patterns',
         'params'
     ]
+
+
+    def prepare_url_and_req_body(self):
+        """
+        placehoder for prepare_url_and_req_body function.
+        This should be implemented in the actual child controller.
+
+        process the input params, compose the url and request body
+        """
+        raise NotImplementedError
+
+
+    def call_jira(self):
+        """
+        placehoder for call_jira function.
+        This should be implemented in the actual child controller
+        """
+        raise NotImplementedError
+
 
     def __init__(self, trigger: str, mode: str = 'microphone'):
         """
@@ -54,6 +81,7 @@ class BaseController(ABC):
         if self.active:
             self.__update_multiple_params(trigger)
 
+
     def __set_controller_properties(self):
         """
         sets controller's properties according to it's config file
@@ -71,14 +99,18 @@ class BaseController(ABC):
         _config_module = importlib.import_module(_config_path)
 
         #  mandatory properties check
-        if not set(self.__mandatory_properties).issubset(set(_config_module.controller_properties.keys())):
-            _message = "Not all mandatory properties are present in the controller's config file:{} " \
-                .format(str(self.__mandatory_properties))
+        if not set(self.mandatory_properties).issubset(set(_config_module.controller_properties.keys())):
+            _message = "[Controller config error]. Not all mandatory properties are present:{} " \
+                .format(str(self.mandatory_properties))
             raise Exception(_message)
 
         #  set controller's properties
-        for key, value in _config_module.controller_properties.items():
-            setattr(self, key, value)
+        for k, v in _config_module.controller_properties.items():
+            if isinstance(v, dict):
+                setattr(self, k, OrderedDict(v))
+            else:
+                setattr(self, k, v)
+
 
     def __update_multiple_params(self, user_input: str):
         """
@@ -89,10 +121,14 @@ class BaseController(ABC):
 
         """
 
+        if not user_input:
+            return
+
         unfulfilled = self.__list_unfulfilled_params()
 
         for param in unfulfilled:
             self.__update_param(param, user_input)
+
 
     def __update_param(self, param: dict, user_input: str):
         """
@@ -104,12 +140,15 @@ class BaseController(ABC):
 
         """
 
+        if not user_input:
+            return
+
         start_over = re.search(param.get('start_over_command'), user_input) is not None
 
         if start_over:
-            for p in self.params:
-                p['fulfilled'] = False
-                p['skipped'] = False
+            for k, v in self.params.items():
+                v['fulfilled'] = False
+                v['skipped'] = False
         else:
             if not param.get('required'):
                 for cmd in param.get('skip_commands'):
@@ -121,11 +160,13 @@ class BaseController(ABC):
             if not param.get('skipped'):
                 match = re.search(param.get('pattern'), user_input)
                 if match:
-                    param['value'] = match.group()
+                    param['value'] = param.get('dtype')(match.group())
                     param['fulfilled'] = True
 
+
     def __list_unfulfilled_params(self):
-        return [p for p in self.params if (not p.get('fulfilled')) and (not p.get('skipped'))]
+        return [v for k, v in self.params.items() if (not v.get('fulfilled')) and (not v.get('skipped'))]
+
 
     def __interact_with_message(self, message: str):
         """
@@ -146,6 +187,7 @@ class BaseController(ABC):
 
         return user_input
 
+
     def run_pipeline(self, user_input: str = None):
         """
         run_pipeline
@@ -155,16 +197,22 @@ class BaseController(ABC):
 
         Returns:
         """
+        # collect input for JIRA action
         if self.mode == 'api':
-            self.run_pipeline_in_api_mode(user_input)
+            self.collect_params_in_api_mode(user_input)
         else:
-            self.run_pipeline_in_local_mode()
+            self.collect_params_in_local_mode()
 
-        #  TODO: compose JIRA COMMAND
+        # all input params collected, process them for Jira format
+        self.prepare_url_and_req_body()
 
-    def run_pipeline_in_api_mode(self, user_input: str):
+        # all params processed, call Jira
+        self.call_jira()
+
+
+    def collect_params_in_api_mode(self, user_input: str):
         """
-        run_pipeline_in_api_mode
+        collect necessary data in api mode
 
         Args:
             user_input(str):
@@ -177,10 +225,14 @@ class BaseController(ABC):
         self.__update_param(param, user_input)
 
         unfilfulled_params = self.__list_unfulfilled_params()
+        # TODO: logic to collect params in api mode
         #  if not unfilfulled_params:
 
-    def run_pipeline_in_local_mode(self):
-        """run_pipeline_in_local_mode"""
+
+    def collect_params_in_local_mode(self):
+        """
+        collect necessary data in local mode
+        """
         #  for microphone and keyboard mode
         while True:
             unfilfulled_params = self.__list_unfulfilled_params()
